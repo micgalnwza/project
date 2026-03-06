@@ -89,7 +89,7 @@
         <button class="time-btn">15:30</button>
         <button class="time-btn">16:00</button>
         <button class="time-btn">16:30</button>
-        <button class="time-btn">17.00</button>
+        <button class="time-btn">17:00</button>
         <button class="time-btn">17:30</button>
         <button class="time-btn">18:00</button>
         <button class="time-btn">18:30</button>
@@ -133,7 +133,6 @@ function renderCalendar(){
 
   monthYear.innerText = monthNames[month] + " " + (year + 543);
 
-  // ช่องว่างก่อนวันที่ 1
   for(let i=0;i<firstDay;i++){
     calendar.innerHTML += "<div></div>";
   }
@@ -145,38 +144,42 @@ function renderCalendar(){
 
     const thisDate = new Date(year, month, day);
 
-    // ❌ ปิดวันย้อนหลัง
     if(thisDate < new Date(today.getFullYear(), today.getMonth(), today.getDate())){
       dayDiv.classList.add("disabled");
-    } else {
+    } 
+    else {
 
       dayDiv.onclick = function(){
+
         document.querySelectorAll("#calendar div")
-          .forEach(d=>d.classList.remove("active"));
+        .forEach(d=>d.classList.remove("active"));
 
         dayDiv.classList.add("active");
 
         selectedDay = day + "/" + (month+1) + "/" + (year+543);
+        updateTimeButtons();
+
       };
+
     }
 
-    // ⭐ ไฮไลต์วันนี้
     if(day === today.getDate() &&
        month === today.getMonth() &&
        year === today.getFullYear()){
       dayDiv.classList.add("today");
     }
 
-    // 🔴 อาทิตย์สีแดง
     if(new Date(year, month, day).getDay() === 0){
       dayDiv.classList.add("sunday");
     }
 
     calendar.appendChild(dayDiv);
   }
+
 }
 
-/* เปลี่ยนเดือน */
+/* ---------- เปลี่ยนเดือน ---------- */
+
 document.getElementById("prevMonth").onclick = function(){
   currentDate.setMonth(currentDate.getMonth()-1);
   renderCalendar();
@@ -187,24 +190,103 @@ document.getElementById("nextMonth").onclick = function(){
   renderCalendar();
 }
 
-/* ---------- เวลา ---------- */
+/* ---------- เช็คสถานะเวลา ---------- */
 
-const times = document.querySelectorAll(".time-btn");
+/* ---------- โหลดเวลาเมื่อเลือกวัน ---------- */
 
-times.forEach(btn=>{
-  btn.onclick = function(){
-    times.forEach(t=>t.classList.remove("active"));
-    btn.classList.add("active");
-    selectedTime = btn.innerText;
-  }
-});
+function updateTimeButtons(){
 
-/* ---------- ไปหน้า confirm ---------- */
+  if(!selectedDay) return;
+
+  const parts = selectedDay.split("/");
+  const day = parts[0];
+  const month = parts[1];
+  const year = parts[2]-543;
+
+  const dateObj = new Date(year,month-1,day);
+  const dateKey =
+  dateObj.getFullYear() + "-" +
+  String(dateObj.getMonth()+1).padStart(2,"0") + "-" +
+  String(dateObj.getDate()).padStart(2,"0");
+
+  const schedule = JSON.parse(localStorage.getItem("schedule_"+dateKey)) || {};
+  const closed = localStorage.getItem("close_"+dateKey) === "true";
+
+  const buttons = document.querySelectorAll(".time-btn");
+
+  selectedTime = null;
+
+  buttons.forEach(btn=>{
+
+    const time = btn.innerText;
+
+    btn.classList.remove("active","disabled");
+
+    btn.style.pointerEvents="auto";
+    btn.style.opacity="1";
+
+    /* ร้านปิด */
+    if(closed){
+      btn.classList.add("disabled");
+      btn.style.pointerEvents="none";
+      btn.style.opacity="0.3";
+      return;
+    }
+
+    /* เวลาไม่ว่าง */
+    if(schedule[time] === "ไม่ว่าง"){
+      btn.classList.add("disabled");
+      btn.style.pointerEvents="none";
+      btn.style.opacity="0.4";
+      return;
+    }
+
+    /* เวลาว่าง */
+    btn.onclick = function(){
+
+      buttons.forEach(b=>b.classList.remove("active"));
+
+      btn.classList.add("active");
+
+      selectedTime = time;
+
+    }
+
+  });
+
+}
+
+/* ---------- ยืนยัน ---------- */
 
 function goConfirm(){
 
   if(!selectedDay || !selectedTime){
     alert("กรุณาเลือกวันและเวลา");
+    return;
+  }
+
+  const parts = selectedDay.split("/");
+  const day = parts[0];
+  const month = parts[1];
+  const year = parts[2]-543;
+
+  const dateObj = new Date(year,month-1,day);
+  const dateKey =
+  dateObj.getFullYear() + "-" +
+  String(dateObj.getMonth()+1).padStart(2,"0") + "-" +
+  String(dateObj.getDate()).padStart(2,"0");
+  /* เช็คว่าร้านปิดไหม */
+  const closed = localStorage.getItem("close_"+dateKey) === "true";
+
+  if(closed){
+    alert("วันนี้ร้านปิดทำการ");
+    return;
+  }
+
+  const schedule = JSON.parse(localStorage.getItem("schedule_"+dateKey)) || {};
+
+  if(schedule[selectedTime] === "ไม่ว่าง"){
+    alert("เวลานี้ถูกจองแล้ว");
     return;
   }
 
@@ -216,9 +298,13 @@ function goConfirm(){
 
   window.location.href = "confirm.html";
 }
+
+/* ---------- เริ่มต้น ---------- */
 renderCalendar();
 
-</script>
+/* โหลดสถานะเวลาเมื่อเปิดหน้า */
+updateTimeButtons();
 
+</script>
 </body>
 </html>

@@ -673,3 +673,9 @@ border:none;
 border-radius:10px;
 cursor:pointer;
 }
+
+.time-btn.disabled{
+cursor:not-allowed;
+background:#444;
+color:#999;
+}

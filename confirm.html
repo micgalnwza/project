@@ -156,88 +156,73 @@ alert("เบอร์โทรต้องมี 10 หลัก");
 return;
 }
 
-const queueNumber =
-Math.floor(Math.random()*1000)
+const queueNumber = Math.floor(Math.random()*1000)
 .toString()
 .padStart(3,"0");
 
 document.getElementById("showQueue").innerText = queueNumber;
 
 
-/* ============================= */
-/* ⭐ เพิ่มระบบบันทึกการจอง */
-/* ============================= */
+/* บันทึก booking */
 
-let bookings =
-JSON.parse(localStorage.getItem("bookings")) || [];
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
 
 bookings.push({
-
 name:name,
 phone:phone,
 email:email,
-
 date:date,
 time:time,
-
 note:note || "-",
-
 queue:queueNumber,
-
 status:"รอ"
-
 });
 
-localStorage.setItem(
-"bookings",
-JSON.stringify(bookings)
-);
-
-/* ============================= */
+localStorage.setItem("bookings",JSON.stringify(bookings));
 
 
-const booking = {
+/* แจ้งเตือนลูกค้า */
 
+let notifications = JSON.parse(localStorage.getItem("notifications")) || [];
+
+notifications.unshift({
 type:"confirm",
-message:"ยืนยันการจองสำเร็จ",
+message:"จองคิวสำเร็จ คิวของคุณคือ #"+queueNumber,
+timestamp:new Date().toLocaleString("th-TH")
+});
 
+localStorage.setItem("notifications",JSON.stringify(notifications));
+
+
+/* ⭐ แจ้งเตือนแอดมิน */
+
+let adminNotifications = JSON.parse(localStorage.getItem("adminNotifications")) || [];
+
+adminNotifications.unshift({
+message:"มีการจองคิวใหม่ "+name+" เวลา "+time,
+timestamp:new Date().toLocaleString("th-TH")
+});
+
+localStorage.setItem("adminNotifications",JSON.stringify(adminNotifications));
+
+
+/* บันทึก final booking */
+
+localStorage.setItem("finalBooking",JSON.stringify({
 name:name,
 phone:phone,
 email:email,
-
 date:date,
 time:time,
+queue:queueNumber
+}));
 
-note:note || "-",
-
-queue:queueNumber,
-
-timestamp:new Date().toLocaleString("th-TH")
-
-};
-
-
-let notifications =
-JSON.parse(localStorage.getItem("notifications")) || [];
-
-notifications.unshift(booking);
-
-localStorage.setItem(
-"notifications",
-JSON.stringify(notifications)
-);
-
-localStorage.setItem(
-"finalBooking",
-JSON.stringify(booking)
-);
 
 alert("จองสำเร็จ! คิวของคุณคือ #"+queueNumber);
 
 window.location.href="index.html";
 
 }
-
 
 
 function openCancelPopup(){
