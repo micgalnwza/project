@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>จองคิว | FM Barber</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <h2>FM<br>Barber</h2>
+  </div>
+
+  <nav>
+    <a href="index.html">หน้าหลัก</a>
+    <a href="portfolio.html">ผลงาน</a>
+  </nav>
+
+  <div class="right-menu">
+        <a href="notification.html" class="notification active">
+            <i class="fa-solid fa-bell"></i>
+        </a>
+    <button class="login-btn" onclick="window.location.href='admin.html'">
+      เข้าสู่ระบบหลังร้าน
+</button>
+  </div>
+</header>
+
+<hr><hr>
+
+<section class="booking-page">
+
+  <div class="booking-header">
+    <div>
+      <h1>จองคิวตัดผม FM Barber</h1>
+      <p>บริการตัดผมชายโดยช่างมือคุณภาพ เลือกวันและเวลาที่สะดวก</p>
+    </div>
+
+    <div class="notice-box">
+      ร้านเปิด 09.00 – 21.00 น.<br>
+      กรุณามาก่อนเวลา 5–10 นาที
+    </div>
+  </div>
+
+  <div class="booking-content">
+
+    <!-- ซ้าย -->
+    <div class="left-side">
+      <h3>1. เลือกวัน</h3>
+
+      <div class="calendar-box">
+        <div class="calendar-header">
+          <button id="prevMonth">‹</button>
+          <h4 id="monthYear"></h4>
+          <button id="nextMonth">›</button>
+        </div>
+        <div class="calendar-grid" id="calendar"></div>
+      </div>
+      <!-- หมายเหตุถึงร้าน -->
+<div class="note-section">
+  <h3>3. หมายเหตุถึงร้าน</h3>
+  <textarea id="noteInput" placeholder="ระบุรายละเอียดคำขอ (ถ้ามี)"></textarea>
+</div>
+    </div>
+     
+
+    <!-- ขวา -->
+    <div class="right-side">
+      <h3>2. เลือกเวลา</h3>
+
+      <div class="time-grid">
+        <button class="time-btn">09:00</button>
+        <button class="time-btn">09:30</button>
+        <button class="time-btn">10:00</button>
+        <button class="time-btn">10:30</button>
+        <button class="time-btn">11:00</button>
+        <button class="time-btn">11:30</button>
+        <button class="time-btn">12:00</button>
+        <button class="time-btn">12:30</button>
+        <button class="time-btn">13:00</button>
+        <button class="time-btn">13:30</button>
+        <button class="time-btn">14:00</button>
+        <button class="time-btn">14:30</button>
+        <button class="time-btn">15:00</button>
+        <button class="time-btn">15:30</button>
+        <button class="time-btn">16:00</button>
+        <button class="time-btn">16:30</button>
+        <button class="time-btn">17.00</button>
+        <button class="time-btn">17:30</button>
+        <button class="time-btn">18:00</button>
+        <button class="time-btn">18:30</button>
+        <button class="time-btn">19:00</button>
+        <button class="time-btn">19:30</button>
+        <button class="time-btn">20:00</button>
+        <button class="time-btn">20:30</button>
+        <button class="time-btn">21:00</button>
+      </div>
+
+      <button class="confirm-btn" onclick="goConfirm()">ยืนยันการจอง</button>
+    </div>
+
+  </div>
+</section>
+
+<script>
+
+let currentDate = new Date();
+let selectedDay = null;
+let selectedTime = null;
+
+const calendar = document.getElementById("calendar");
+const monthYear = document.getElementById("monthYear");
+
+/* ---------- ปฏิทิน ---------- */
+
+function renderCalendar(){
+
+  calendar.innerHTML = "";
+
+  const today = new Date();
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const lastDate = new Date(year, month+1, 0).getDate();
+
+  const monthNames = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน",
+                      "กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+
+  monthYear.innerText = monthNames[month] + " " + (year + 543);
+
+  // ช่องว่างก่อนวันที่ 1
+  for(let i=0;i<firstDay;i++){
+    calendar.innerHTML += "<div></div>";
+  }
+
+  for(let day=1; day<=lastDate; day++){
+
+    const dayDiv = document.createElement("div");
+    dayDiv.innerText = day;
+
+    const thisDate = new Date(year, month, day);
+
+    // ❌ ปิดวันย้อนหลัง
+    if(thisDate < new Date(today.getFullYear(), today.getMonth(), today.getDate())){
+      dayDiv.classList.add("disabled");
+    } else {
+
+      dayDiv.onclick = function(){
+        document.querySelectorAll("#calendar div")
+          .forEach(d=>d.classList.remove("active"));
+
+        dayDiv.classList.add("active");
+
+        selectedDay = day + "/" + (month+1) + "/" + (year+543);
+      };
+    }
+
+    // ⭐ ไฮไลต์วันนี้
+    if(day === today.getDate() &&
+       month === today.getMonth() &&
+       year === today.getFullYear()){
+      dayDiv.classList.add("today");
+    }
+
+    // 🔴 อาทิตย์สีแดง
+    if(new Date(year, month, day).getDay() === 0){
+      dayDiv.classList.add("sunday");
+    }
+
+    calendar.appendChild(dayDiv);
+  }
+}
+
+/* เปลี่ยนเดือน */
+document.getElementById("prevMonth").onclick = function(){
+  currentDate.setMonth(currentDate.getMonth()-1);
+  renderCalendar();
+}
+
+document.getElementById("nextMonth").onclick = function(){
+  currentDate.setMonth(currentDate.getMonth()+1);
+  renderCalendar();
+}
+
+/* ---------- เวลา ---------- */
+
+const times = document.querySelectorAll(".time-btn");
+
+times.forEach(btn=>{
+  btn.onclick = function(){
+    times.forEach(t=>t.classList.remove("active"));
+    btn.classList.add("active");
+    selectedTime = btn.innerText;
+  }
+});
+
+/* ---------- ไปหน้า confirm ---------- */
+
+function goConfirm(){
+
+  if(!selectedDay || !selectedTime){
+    alert("กรุณาเลือกวันและเวลา");
+    return;
+  }
+
+  const note = document.getElementById("noteInput").value;
+
+  localStorage.setItem("selectedDate", selectedDay);
+  localStorage.setItem("selectedTime", selectedTime);
+  localStorage.setItem("bookingNote", note);
+
+  window.location.href = "confirm.html";
+}
+renderCalendar();
+
+</script>
+
+</body>
+</html>

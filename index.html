@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>FM Barber</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <h2>FM<br>Barber</h2>
+    </div>
+
+    <nav>
+        <a href="index.html">หน้าหลัก</a>
+        <a href="portfolio.html">ผลงาน</a>
+    </nav>
+
+    <div class="right-menu">
+        <a href="notification.html" class="notification active">
+            <i class="fa-solid fa-bell"></i>
+        </a>
+        <button class="login-btn" onclick="window.location.href='admin.html'">
+            เข้าสู่ระบบหลังร้าน
+</button>
+    </div>
+</header>
+
+<hr>
+
+<section class="hero">
+    <h1>ยินดีต้อนรับ</h1>
+    <p>ดูแลทรงผมและภาพลักษณ์ของคุณอย่างมืออาชีพ</p>
+</section>
+
+<section class="services">
+    <h3>📁 บริการของเรา</h3>
+
+    <div class="card">
+        <h4>ตัดผม</h4>
+        <p>ตัดผมชายตามความต้องการ เด็ก 80 ธรรมดา 100 เพิ่มเฟด 120</p>
+    </div>
+</section>
+
+<section class="booking">
+    <h3>การจอง</h3>
+
+    <div id="bookingContainer"></div>
+
+</section>
+
+<section class="policy">
+    <div class="card policy-card">
+        <h4>• นโยบายการจอง</h4>
+        <p class="policy-text">
+            กรุณาแจ้งเลื่อนหรือยกเลิกนัดหมายล่วงหน้าอย่างน้อย 24 ชั่วโมง 
+            เพื่อหลีกเลี่ยงค่าธรรมเนียมการยกเลิกล่าช้า
+        </p>
+    </div>
+</section>
+
+<script>
+
+const container = document.getElementById("bookingContainer");
+const booking = JSON.parse(localStorage.getItem("finalBooking"));
+
+if(booking){
+
+    container.innerHTML = `
+        <div class="card booking-card active-booking">
+            <p><strong>คุณ</strong></p>
+            <p>🎟 คิวที่: <strong>#${booking.queue}</strong></p>
+            <p>📅 ${booking.date}</p>
+            <p>⏰ ${booking.time}</p>
+            <button class="cancel-btn" onclick="cancelBooking()">ยกเลิกการจอง</button>
+        </div>
+    `;
+
+}
+else{
+
+    container.innerHTML = `
+        <div class="card booking-card">
+            <p>คุณไม่มีคิวในตอนนี้...</p>
+            <a href="booking.html" class="book-btn">จองคิว</a>
+        </div>
+    `;
+}
+
+function cancelBooking(){
+
+const cancelData = {
+type: "cancel",
+message: "ยกเลิกการจองสำเร็จ",
+timestamp: new Date().toLocaleString("th-TH")
+};
+
+let notifications = JSON.parse(localStorage.getItem("notifications")) || [];
+notifications.unshift(cancelData);
+localStorage.setItem("notifications", JSON.stringify(notifications));
+
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+const booking = JSON.parse(localStorage.getItem("finalBooking"));
+
+if(booking){
+
+bookings = bookings.filter(b =>
+!(b.name === booking.name &&
+  b.date === booking.date &&
+  b.time === booking.time)
+);
+
+localStorage.setItem("bookings", JSON.stringify(bookings));
+
+}
+
+/* ⭐ */
+
+localStorage.removeItem("finalBooking");
+
+location.reload();
+}
+
+</script>
+
+</body>
+</html>

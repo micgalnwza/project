@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>FM BARBER</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background:black;
+    color:white;
+}
+
+/* Layout */
+.container{
+    display:flex;
+    height:100vh;
+}
+
+/* ซ้าย */
+.left{
+    flex:1;
+    background:linear-gradient(to bottom, #000, #111);
+    padding:40px;
+}
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+}
+
+.tag{
+    color:#c9a96e;
+    font-size:14px;
+    margin-bottom:30px;
+}
+
+.shop-img{
+    width:80%;
+    border-radius:5px;
+}
+
+/* ขวา */
+.right{
+    flex:1;
+    background:#2f3434;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.box{
+    width:320px;
+}
+
+/* input */
+.input-box{
+    position:relative;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    border-radius:25px;
+    border:none;
+    margin:10px 0;
+    background:#dcdcdc;
+}
+
+/* ปุ่มโชว์รหัส */
+.eye{
+    position:absolute;
+    right:15px;
+    top:20px;
+    cursor:pointer;
+}
+
+/* ปุ่ม */
+button{
+    width:100%;
+    padding:12px;
+    margin-top:12px;
+    border:none;
+    background:#e5e5e5;
+    cursor:pointer;
+    font-size:15px;
+}
+
+button:hover{
+    background:white;
+}
+
+.error{
+    color:#ff4d4d;
+    font-size:14px;
+    display:none;
+}
+
+/* link */
+.link{
+    font-size:14px;
+    text-align:right;
+    cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- ซ้าย -->
+<div class="left">
+
+<div class="logo">FM BARBER</div>
+<div class="tag">Authentic Grooming</div>
+
+<img src="image/615011838_1843156362987726_6848042603928847340_n.png" class="shop-img">
+
+</div>
+
+<!-- ขวา -->
+<div class="right">
+
+<div class="box">
+
+<h2 style="text-align:center;">เข้าสู่ระบบ / Sign in</h2>
+
+<label>Email Address / อีเมล</label>
+<input id="user">
+
+<label>Password / รหัสผ่าน</label>
+
+<div class="input-box">
+<input type="password" id="pass">
+<span class="eye" onclick="togglePass()">👁️</span>
+</div>
+
+<div class="link" onclick="location.href='forgot.html'">
+ลืมรหัสผ่าน ?
+</div>
+
+<p class="error" id="error">
+❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง
+</p>
+
+<button onclick="login()">Continue</button>
+
+<button onclick="location.href='register.html'">
+สมัครสมาชิก
+</button>
+
+<button onclick="location.href='admin.html'">
+เข้าสู่ระบบหลังบ้าน
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+/* โชว์รหัส */
+function togglePass(){
+let p=document.getElementById("pass");
+p.type = p.type==="password" ? "text" : "password";
+}
+
+/* login */
+function login(){
+
+let u=document.getElementById("user").value;
+let p=document.getElementById("pass").value;
+
+if(u==="user" && p==="1234"){
+alert("เข้าสู่ระบบสำเร็จ");
+}
+else{
+document.getElementById("error").style.display="block";
+}
+
+}
+
+</script>
+
+</body>
+</html>

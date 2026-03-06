@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>ยืนยันข้อมูลการจอง</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+
+<header>
+<div class="logo">
+<h2>FM<br>Barber</h2>
+</div>
+
+<nav class="center-menu">
+<a href="index.html">หน้าหลัก</a>
+<a href="portfolio.html">ผลงาน</a>
+</nav>
+
+<div class="right-menu">
+<a href="notification.html" class="notification active">
+<i class="fa-solid fa-bell"></i>
+</a>
+
+<button class="login-btn" onclick="window.location.href='admin.html'">
+เข้าสู่ระบบหลังร้าน
+</button>
+
+</div>
+</header>
+
+
+<div class="confirm-container">
+
+<h2>ยืนยันข้อมูลการจอง</h2>
+
+<div class="info">
+
+<p>ชื่อผู้ใช้บริการ:</p>
+<input type="text" id="name" placeholder="กรอกชื่อผู้ใช้บริการ">
+
+<p>เบอร์โทร:</p>
+<input type="text" id="phone" placeholder="กรอกเบอร์โทร 10 หลัก">
+
+<p>อีเมล:</p>
+<input type="email" id="email" placeholder="example@email.com">
+
+<p>วันที่ที่ต้องการใช้บริการ:</p>
+<span id="showDate"></span>
+
+<p>เวลาที่ต้องการใช้บริการ:</p>
+<span id="showTime"></span>
+
+<p>ลำดับคิวของคุณ:</p>
+<span id="showQueue" style="color:#00ff99;font-weight:700;"></span>
+
+<p id="showNote"></p>
+
+</div>
+
+
+<div class="btn-group">
+
+<button type="button" onclick="window.location.href='booking.html'">
+แก้ไขการจอง
+</button>
+
+<button type="button" onclick="saveBooking()">
+ยืนยันการจอง
+</button>
+
+</div>
+
+<button type="button" class="cancel" onclick="openCancelPopup()">
+ยกเลิกการจอง
+</button>
+
+</div>
+
+
+<div id="cancelPopup" class="popup">
+
+<div class="popup-box">
+
+<h3>คุณต้องการยกเลิกการจองหรือไม่ ?</h3>
+
+<div class="popup-btn">
+
+<button onclick="closeCancelPopup()" class="no">
+ไม่
+</button>
+
+<button onclick="confirmCancel()" class="yes">
+ใช่
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div id="cancelSuccess" class="popup">
+
+<div class="popup-box">
+
+<h3>ยกเลิกการจองสำเร็จ</h3>
+
+<button onclick="goHome()" class="ok">
+ตกลง
+</button>
+
+</div>
+
+</div>
+
+
+
+<script>
+const date = localStorage.getItem("selectedDate");
+const time = localStorage.getItem("selectedTime");
+const note = localStorage.getItem("bookingNote");
+
+document.getElementById("showDate").innerText = date || "-";
+document.getElementById("showTime").innerText = time || "-";
+document.getElementById("showNote").innerText =
+"หมายเหตุ: " + (note || "-");
+
+
+function saveBooking(){
+
+const name = document.getElementById("name").value.trim();
+const phone = document.getElementById("phone").value.trim();
+const email = document.getElementById("email").value.trim();
+
+if(name === ""){
+alert("กรุณากรอกชื่อผู้ใช้บริการ");
+return;
+}
+
+if(phone === ""){
+alert("กรุณากรอกเบอร์โทร");
+return;
+}
+
+if(!/^[0-9]+$/.test(phone)){
+alert("เบอร์โทรต้องเป็นตัวเลขเท่านั้น");
+return;
+}
+
+if(phone.length !== 10){
+alert("เบอร์โทรต้องมี 10 หลัก");
+return;
+}
+
+const queueNumber =
+Math.floor(Math.random()*1000)
+.toString()
+.padStart(3,"0");
+
+document.getElementById("showQueue").innerText = queueNumber;
+
+
+/* ============================= */
+/* ⭐ เพิ่มระบบบันทึกการจอง */
+/* ============================= */
+
+let bookings =
+JSON.parse(localStorage.getItem("bookings")) || [];
+
+bookings.push({
+
+name:name,
+phone:phone,
+email:email,
+
+date:date,
+time:time,
+
+note:note || "-",
+
+queue:queueNumber,
+
+status:"รอ"
+
+});
+
+localStorage.setItem(
+"bookings",
+JSON.stringify(bookings)
+);
+
+/* ============================= */
+
+
+const booking = {
+
+type:"confirm",
+message:"ยืนยันการจองสำเร็จ",
+
+name:name,
+phone:phone,
+email:email,
+
+date:date,
+time:time,
+
+note:note || "-",
+
+queue:queueNumber,
+
+timestamp:new Date().toLocaleString("th-TH")
+
+};
+
+
+let notifications =
+JSON.parse(localStorage.getItem("notifications")) || [];
+
+notifications.unshift(booking);
+
+localStorage.setItem(
+"notifications",
+JSON.stringify(notifications)
+);
+
+localStorage.setItem(
+"finalBooking",
+JSON.stringify(booking)
+);
+
+alert("จองสำเร็จ! คิวของคุณคือ #"+queueNumber);
+
+window.location.href="index.html";
+
+}
+
+
+
+function openCancelPopup(){
+document.getElementById("cancelPopup").style.display="flex";
+}
+
+function closeCancelPopup(){
+document.getElementById("cancelPopup").style.display="none";
+}
+
+
+function confirmCancel(){
+
+let notifications =
+JSON.parse(localStorage.getItem("notifications")) || [];
+
+notifications.unshift({
+
+type:"cancel",
+message:"ยกเลิกการจองสำเร็จ",
+
+timestamp:new Date().toLocaleString("th-TH")
+
+});
+
+localStorage.setItem(
+"notifications",
+JSON.stringify(notifications)
+);
+
+document.getElementById("cancelPopup").style.display="none";
+document.getElementById("cancelSuccess").style.display="flex";
+
+}
+
+
+function goHome(){
+window.location.href="index.html";
+}
+
+</script>
+
+</body>
+</html>
