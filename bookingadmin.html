@@ -249,6 +249,9 @@ JSON.parse(localStorage.getItem("bookings")) || []
 
 function render(){
 
+let bookings =
+JSON.parse(localStorage.getItem("bookings")) || []
+
 const table=document.getElementById("bookingTable")
 
 table.innerHTML=""
@@ -298,6 +301,28 @@ function cancel(i){
 
 if(confirm("ยกเลิกคิวนี้?")){
 
+let bookings =
+JSON.parse(localStorage.getItem("bookings")) || []
+
+let booking = bookings[i]
+
+/* แจ้งเตือนลูกค้า */
+
+let notifications =
+JSON.parse(localStorage.getItem("notifications")) || []
+
+notifications.unshift({
+message:"คิวของคุณวันที่ "+booking.date+" เวลา "+booking.time+" ถูกยกเลิกโดยร้าน",
+timestamp:new Date().toLocaleString("th-TH")
+})
+
+localStorage.setItem(
+"notifications",
+JSON.stringify(notifications)
+)
+
+/* ลบ booking */
+
 bookings.splice(i,1)
 
 localStorage.setItem(
@@ -305,13 +330,24 @@ localStorage.setItem(
 JSON.stringify(bookings)
 )
 
+/* ลบเฉพาะคิวเดียวกัน */
+
+let finalBooking =
+JSON.parse(localStorage.getItem("finalBooking"))
+
+if(finalBooking && finalBooking.queue === booking.queue){
+localStorage.removeItem("finalBooking")
+}
+
 render()
 
 }
 
 }
-
 function finish(i){
+
+let bookings =
+JSON.parse(localStorage.getItem("bookings")) || []
 
 bookings[i].status="เสร็จ"
 
@@ -323,10 +359,8 @@ JSON.stringify(bookings)
 render()
 
 }
+render();
 
-render()
-
-</script>
 </script>
 
 </body>

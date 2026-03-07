@@ -65,29 +65,34 @@
 <script>
 
 const container = document.getElementById("bookingContainer");
+
+function renderBooking(){
+
 const booking = JSON.parse(localStorage.getItem("finalBooking"));
 
 if(booking){
 
-    container.innerHTML = `
-        <div class="card booking-card active-booking">
-            <p><strong>คุณ</strong></p>
-            <p>🎟 คิวที่: <strong>#${booking.queue}</strong></p>
-            <p>📅 ${booking.date}</p>
-            <p>⏰ ${booking.time}</p>
-            <button class="cancel-btn" onclick="cancelBooking()">ยกเลิกการจอง</button>
-        </div>
-    `;
+container.innerHTML = `
+<div class="card booking-card active-booking">
+<p><strong>${booking.name || "คุณ"}</strong></p>
+<p>🎟 คิวที่: <strong>#${booking.queue}</strong></p>
+<p>📅 ${booking.date}</p>
+<p>⏰ ${booking.time}</p>
+<button class="cancel-btn" onclick="cancelBooking()">ยกเลิกการจอง</button>
+</div>
+`;
+
+}else{
+
+container.innerHTML = `
+<div class="card booking-card">
+<p>คุณไม่มีคิวในตอนนี้...</p>
+<a href="booking.html" class="book-btn">จองคิว</a>
+</div>
+`;
 
 }
-else{
 
-    container.innerHTML = `
-        <div class="card booking-card">
-            <p>คุณไม่มีคิวในตอนนี้...</p>
-            <a href="booking.html" class="book-btn">จองคิว</a>
-        </div>
-    `;
 }
 
 function cancelBooking(){
@@ -96,44 +101,57 @@ const booking = JSON.parse(localStorage.getItem("finalBooking"));
 
 /* แจ้งเตือนลูกค้า */
 
-let notifications = JSON.parse(localStorage.getItem("notifications")) || [];
+let notifications =
+JSON.parse(localStorage.getItem("notifications")) || []
 
 notifications.unshift({
-type:"cancel",
-message:"คุณได้ยกเลิกการจองแล้ว",
+message:"คุณได้ยกเลิกคิววันที่ "+booking.date+" เวลา "+booking.time,
 timestamp:new Date().toLocaleString("th-TH")
-});
+})
 
-localStorage.setItem("notifications",JSON.stringify(notifications));
+localStorage.setItem(
+"notifications",
+JSON.stringify(notifications)
+)
 
+/* แจ้งเตือนแอดมิน */
 
-/* ⭐ แจ้งเตือนแอดมิน */
-
-let adminNotifications = JSON.parse(localStorage.getItem("adminNotifications")) || [];
+let adminNotifications =
+JSON.parse(localStorage.getItem("adminNotifications")) || []
 
 adminNotifications.unshift({
-message:"ลูกค้า "+booking.name+" ยกเลิกคิว "+booking.time,
+message:"ลูกค้า "+booking.name+" ยกเลิกคิว #"+booking.queue,
 timestamp:new Date().toLocaleString("th-TH")
-});
+})
 
-localStorage.setItem("adminNotifications",JSON.stringify(adminNotifications));
+localStorage.setItem(
+"adminNotifications",
+JSON.stringify(adminNotifications)
+)
 
+/* ลบ booking ด้วย queue */
 
-/* ลบ booking */
+let bookings =
+JSON.parse(localStorage.getItem("bookings")) || []
 
-let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+bookings = bookings.filter(b => b.queue !== booking.queue)
 
-bookings = bookings.filter(b =>
-!(b.name === booking.name && b.date === booking.date && b.time === booking.time)
-);
+localStorage.setItem(
+"bookings",
+JSON.stringify(bookings)
+)
 
-localStorage.setItem("bookings",JSON.stringify(bookings));
+localStorage.removeItem("finalBooking")
 
-localStorage.removeItem("finalBooking");
-
-location.reload();
+renderBooking()
 
 }
+
+renderBooking()
+
+setInterval(()=>{
+renderBooking()
+},2000)
 
 </script>
 

@@ -46,14 +46,17 @@
 
 const container = document.getElementById("notificationContainer");
 
-let notifications = JSON.parse(localStorage.getItem("notifications")) || [];
+function getNotifications(){
+    return JSON.parse(localStorage.getItem("notifications")) || [];
+}
 
 function renderNotifications(){
+
+    const notifications = getNotifications();
 
     container.innerHTML = "";
 
     if(notifications.length === 0){
-
         container.innerHTML = "<p style='color:white;'>ไม่มีการแจ้งเตือน</p>";
         return;
     }
@@ -63,27 +66,27 @@ function renderNotifications(){
         container.innerHTML += `
 
         <div class="noti-card">
-
             <div class="noti-text">
                 <h4>
                     ${noti.message}
                     <i class="fa-solid fa-circle-check success"></i>
                 </h4>
-
                 <p>${noti.timestamp}</p>
             </div>
 
             <div class="noti-delete">
                 <i class="fa-solid fa-trash" onclick="deleteNotification(${index})"></i>
             </div>
-
         </div>
 
         `;
     });
+
 }
 
 function deleteNotification(index){
+
+    let notifications = getNotifications();
 
     notifications.splice(index,1);
 
